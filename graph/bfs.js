@@ -1,4 +1,4 @@
-//The graph should be undirected for BFS
+//unweighted graph - BFS
 var Node = {
     parent: undefined,
     level: Number.POSITIVE_INFINITY,
