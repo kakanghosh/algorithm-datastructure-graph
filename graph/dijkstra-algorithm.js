@@ -2,13 +2,13 @@
 var Node = {
     name: '',
     parent: undefined,
-    totalCost: Number.POSITIVE_INFINITY,
+    cost: Number.POSITIVE_INFINITY,
     visited: false
 }
 
 var Graph = {
     noOfNode: 0,
-    myMap: new Map(),
+    adcencyList: new Map(),
     nodes: new Map(),
     initNodes: function () {
         for(let i = 1; i <= this.noOfNode; i += 1){
@@ -16,30 +16,70 @@ var Graph = {
         }
     },
     addEdge: function(node1, node2, pathCost) {
-        if(this.myMap.get(node1) == undefined){
-            this.myMap.set(node1, [{pathCost, node: this.nodes.get(node2)}]);
+        if(this.adcencyList.get(node1) == undefined){
+            this.adcencyList.set(node1, [{pathCost, node: this.nodes.get(node2)}]);
         }else{
-            this.myMap.get(node1).push({pathCost, node: this.nodes.get(node2)});
+            this.adcencyList.get(node1).push({pathCost, node: this.nodes.get(node2)});
         }
         
-        if(this.myMap.get(node2) == undefined){
-            this.myMap.set(node2, [{pathCost, node: this.nodes.get(node1)}]);
+        if(this.adcencyList.get(node2) == undefined){
+            this.adcencyList.set(node2, [{pathCost, node: this.nodes.get(node1)}]);
         }else{
-            this.myMap.get(node2).push({pathCost, node: this.nodes.get(node1)});
+            this.adcencyList.get(node2).push({pathCost, node: this.nodes.get(node1)});
         }
     },
     getPathCost: function(startNode, endNode){
-        adjacencyList = this.myMap.get(startNode);
+        adjacencyList = this.adcencyList.get(startNode);
         for(let i = 0; i < adjacencyList.length; i += 1){
             if(adjacencyList[i].node.name == endNode){
                 return adjacencyList[i].pathCost;
             }
         }
+    },
+    pathRelax: function(node, cost){
+        this.nodes.get(node).cost = cost;
+    } 
+}
+
+class Priority_Queue{
+    constructor(){
+        this.queue = []
+    }
+    insert(node){
+        this.queue.push(node);
+    }
+    pop(){
+        let index = 0;
+        let minimumNode = this.queue[index];
+        for(let i = 1; i < this.queue.length; i += 1){
+            if (this.queue[i].cost < minimumNode.cost){
+                index = i;
+                minimumNode = this.queue[i];
+            }
+        }
+        this.queue.splice(index, 1);
+        return minimumNode;
+    }
+    isEmpty(){
+        return this.queue.length == 0 ? true : false;
     }
 }
 
 const dijkstraShortestPath = function(graph, startingNode){
-    
+    pQueue = new Priority_Queue();
+    let node = graph.nodes.get(startingNode);
+    node.cost = 0;
+    pQueue.insert(node);
+    while(!pQueue.isEmpty()){
+        let node = pQueue.pop();
+        graph.adcencyList.get(node.name).map(adjacentNode => {
+            if(adjacentNode.node.cost > (adjacentNode.pathCost + node.cost)){
+                myGraph.pathRelax(adjacentNode.node.name, adjacentNode.pathCost + node.cost);
+                adjacentNode.node.parent = node.name
+                pQueue.insert(adjacentNode.node);
+            }
+        })
+    }
 }
 
 myGraph = Object.assign({}, Graph);
@@ -62,4 +102,5 @@ myGraph.addEdge(8,10,1);
 myGraph.addEdge(9,10,5);
 myGraph.addEdge(7,10,3);
 
-console.log(myGraph.myMap);
+dijkstraShortestPath(myGraph, 1);
+console.log(myGraph.nodes);
