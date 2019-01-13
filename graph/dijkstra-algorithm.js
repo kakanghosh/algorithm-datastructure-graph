@@ -1,4 +1,4 @@
-//Bicoloring Graph
+//Dijkstra Shortest Path
 var Node = {
     name: '',
     parent: undefined,
